@@ -1,0 +1,56 @@
+import json
+import os
+
+
+def retrieve_rag_knowledge(product_name: str) -> str:
+    """Retrieves buying advice context from knowledge_base.json"""
+    kb_file = "knowledge_base.json"
+    if not os.path.exists(kb_file):
+        return "General Strategy: Cross-check prices across multiple global retailers."
+
+    try:
+        with open(kb_file, "r", encoding="utf-8") as f:
+            kb_data = json.load(f)
+    except Exception:
+        return "General Strategy: Cross-check prices across multiple global retailers."
+
+    name_lower = (product_name or "").lower()
+    for entry in kb_data:
+        keywords = entry.get("keywords", [])
+        if any(kw.lower() in name_lower for kw in keywords):
+            return f"Category: {entry.get('category','N/A')}. Tip: {entry.get('tip','') }"
+
+    return "General Strategy: Cross-check prices across multiple global retailers."
+
+
+def analyze_deal_with_rag(product_data: dict, target_price: float) -> str:
+    """Evaluates product deal using RAG context and Gemini 2.5 Flash."""
+    client = None
+    try:
+        client = get_gemini_client()
+    except Exception:
+        client = None
+
+    title = product_data.get("title", "Product")
+    rag_tip = retrieve_rag_knowledge(title)
+    live_price = float(product_data.get("extracted_price", 0.0) or 0.0)
+
+    prompt = (
+        f"Evaluate this deal:\n"
+        f"- Product: {title}\n"
+        f"- Store: {product_data.get('store')}\n"
+        f"- Live Price: ${live_price}\n"
+        f"- Target Price: ${target_price}\n"
+        f"- RAG Tip: {rag_tip}\n"
+        f"Give brief advice: [BUY NOW/WAIT] and a 1-sentence reason."
+    )
+
+    if client is not None:
+        try:
+            response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+            return getattr(response, "text", str(response)).strip()
+        except Exception:
+            pass
+
+    # Fallback deterministic decision if client unavailable or generation failed
+    return (f"Target Met (${live_price})" if live_price <= target_price else "Target Not Met")
