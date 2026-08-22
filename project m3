@@ -9,8 +9,8 @@ from email.mime.text import MIMEText
 
 logging.basicConfig(level=logging.INFO)
 
-"machariaian044@gmail.com" = os.getenv("machariaian044@gmail.com")
-"mdpg htvf roli jnkp" = os.getenv("mdpg htvf roli jnkp")
+SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+SENDER_PASSWORD= os.getenv("SENDER_EMAIL")
 
 EMAIL_PATTERN = re.compile(
     r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
