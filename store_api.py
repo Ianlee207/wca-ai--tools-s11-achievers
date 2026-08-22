@@ -124,7 +124,119 @@ def analyze_deal_with_rag(product_data: dict, target_price: float) -> str:
 
     # Fallback deterministic decision if client unavailable or generation failed
     return (f"Target Met (${live_price})" if live_price <= target_price else "Target Not Met")
+    
+import os
+import re
+import smtplib
+import logging
+import traceback
 
+from typing import Optional
+from email.mime.text import MIMEText
+
+logging.basicConfig(level=logging.INFO)
+
+"machariaian044@gmail.com" = os.getenv("machariaian044@gmail.com")
+"mdpg htvf roli jnkp" = os.getenv("mdpg htvf roli jnkp")
+
+EMAIL_PATTERN = re.compile(
+    r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
+)
+
+OFF_TOPIC_KEYWORDS = {
+    "weather",
+    "temperature",
+    "recipe",
+    "cook",
+    "joke",
+    "funny",
+    "math",
+    "capital",
+    "history",
+    "science",
+    "python",
+    "programming",
+    "code",
+    "developer",
+    "who is"
+}
+
+GUARDRAIL_REDIRECT = (
+    "I'm sorry, but I can't help you with that, "
+    "but let's get back to saving some money!"
+)
+
+def is_valid_email(email: str) -> bool:
+    return bool(EMAIL_PATTERN.match(email))
+
+def enforce_guardrail_check(
+    user_prompt: str
+) -> Optional[str]:
+    prompt = user_prompt.strip().lower()
+
+    if any(word in prompt for word in OFF_TOPIC_KEYWORDS):
+        return GUARDRAIL_REDIRECT
+
+    return None
+
+def send_price_alert_email(
+    recipient_email: str,
+    product_name: str,
+    live_price: float,
+    target_price: float
+) -> bool:
+
+    if not is_valid_email(recipient_email):
+        return False
+
+    if live_price < 0 or target_price < 0:
+        raise ValueError("Prices cannot be negative")
+
+    if live_price > target_price:
+        return False
+
+    if not 'machariaian@gmail.com' or not 'mdpg htvf roli jnkp':
+        return False
+
+    try:
+        product_name = (
+            product_name.replace("\n", " ")
+            .replace("\r", " ")
+        )
+
+        body = (
+            f"Great news!\n\n"
+            f"{product_name} dropped to "
+            f"${live_price:.2f}\n\n"
+            f"Target Price: ${target_price:.2f}"
+        )
+
+        msg = MIMEText(body)
+        msg["From"] = 'machariaian@gmail.com'
+        msg["To"] = recipient_email
+        msg["Subject"] = (
+            f"Price Drop Alert: {product_name}"
+        )
+
+        with smtplib.SMTP_SSL(
+            "smtp.gmail.com",
+            465,
+            timeout=30
+        ) as server:
+            server.login(
+                'machariaian@gmail.com',
+                'mdpg htvf roli jnkp'
+            )
+            server.send_message(msg)
+
+        logging.info(
+            "Price alert sent successfully."
+        )
+        return True
+
+    except Exception:
+        traceback.print_exc()
+        return False 
 
 import os
 from dotenv import load_dotenv,dotenv_values
