@@ -1,6 +1,6 @@
 import json
 import os
-
+from config import get_gemini_client
 
 def retrieve_rag_knowledge(product_name: str) -> str:
     """Retrieves buying advice context from knowledge_base.json"""
