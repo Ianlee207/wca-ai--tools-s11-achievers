@@ -9,8 +9,8 @@ from email.mime.text import MIMEText
 
 logging.basicConfig(level=logging.INFO)
 
-"machariaian044@gmail.com" = os.getenv("machariaian044@gmail.com")
-"mdpg htvf roli jnkp" = os.getenv("mdpg htvf roli jnkp")
+SENDER_EMAIL = os.getenv("SENDER_EMAIL")
+SENDER_PASSWORD = os.getenv("SENDER_PASSWORD")
 
 EMAIL_PATTERN = re.compile(
     r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
@@ -68,7 +68,7 @@ def send_price_alert_email(
     if live_price > target_price:
         return False
 
-    if not 'machariaian@gmail.com' or not 'mdpg htvf roli jnkp':
+    if not SENDER_EMAIL or not SENDER_PASSWORD:
         return False
 
     try:
@@ -85,7 +85,7 @@ def send_price_alert_email(
         )
 
         msg = MIMEText(body)
-        msg["From"] = 'machariaian@gmail.com'
+        msg["From"] = SENDER_EMAIL
         msg["To"] = recipient_email
         msg["Subject"] = (
             f"Price Drop Alert: {product_name}"
@@ -97,8 +97,8 @@ def send_price_alert_email(
             timeout=30
         ) as server:
             server.login(
-                'machariaian@gmail.com',
-                'mdpg htvf roli jnkp'
+                SENDER_EMAIL,
+                SENDER_PASSWORD
             )
             server.send_message(msg)
 
