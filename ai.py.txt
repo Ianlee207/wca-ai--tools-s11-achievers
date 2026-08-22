@@ -1,0 +1,66 @@
+
+import os
+from dotenv import load_dotenv,dotenv_values
+
+from member1_config import resolve_country_code
+from member2_store import fetch_global_product_price
+from member3_rag import analyze_deal_with_rag,email_alert
+from member4_guardrail import enforce_guadrail_check,guardrail_check_test
+from send_price_alert_email import send_price_alert_email
+
+STORAGE_FILE = "tracked_products.json"
+
+def load_tracked_items():
+     if os.path.exists(STORAGE_FILE,"w") as f:
+        json.dump(data, f, indents=4)
+
+def main():
+    items = load_tracked_items()
+
+     while True:
+           print("======================")
+           print("   OMNISENTINEL ")
+           print("GLOBAL PRICE TRACKER (5-PARTS)"
+           print("======================")
+           print("1. Track New Product")
+           print("2. View Saved Products")
+           print("3. Test Guardrail Interceptor")
+           print("4.Exit")
+
+          choice = input("Select Option (1-4);).strip()
+
+          if == choice"1":
+                user_input = input("Enter Product Nema or Link; ")
+
+               guardrai_res = enforce_guardrail_check(user_input)
+               if not guardrail_res:
+                   print("\no Guardrail Intercept:")
+                   print(guardrail_res)
+                   continue
+       
+               country = input("Enter Country(e.g. Kenya,USA): ").strip()
+               country_code = resolve_country_code(country)
+         
+                store = input("Enter Store Optional:").strip()
+                
+                try:
+                   price_goal = float(input("Enter Target Price: "))
+                except ValueError:
+                   print("no Invalid price number!")
+                   continue
+
+                email = input("Alert Email (Optional): ").strip()
+                
+                print("\n  Fetching price data...")
+                price_data = fetch_global_product_price(user_input,country_code,store)             
+           
+                if price_data:
+                   live_price = price_data["extracted_price"]
+                   ai_advice = analyze_deal_with_rag(price_data, target_price)
+
+                   print(f"\n Result from {price_data['store']}: ${live_price}")
+                   print(f"\n AI Recomendation: {ai_advice}")
+
+                   if email and live_price <= target_price:
+                       send_price_alert_email(email, price-data["title"], live_price, target_price)
+
